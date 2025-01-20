@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+
+	<link rel="stylesheet" href="GomiGame.css">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entraînement Régions et Départements</title>
+    <script>
+        const regions = {
+            1: { name: "Auvergne-Rhône-Alpes", departments: { 1: "Ain", 3: "Allier", 7: "Ardèche", 15: "Cantal", 26: "Drôme", 38: "Isère", 42: "Loire", 43: "Haute-Loire", 63: "Puy-de-Dôme", 69: "Rhône", 73: "Savoie", 74: "Haute-Savoie" } },
+            2: { name: "Bourgogne-Franche-Comté", departments: { 21: "Côte-d'Or", 25: "Doubs", 39: "Jura", 58: "Nièvre", 70: "Haute-Saône", 71: "Saône-et-Loire", 89: "Yonne", 90: "Territoire de Belfort" } },
+            3: { name: "Bretagne", departments: { 22: "Côtes-d'Armor", 29: "Finistère", 35: "Ille-et-Vilaine", 56: "Morbihan" } },
+            4: { name: "Centre-Val de Loire", departments: { 18: "Cher", 28: "Eure-et-Loir", 36: "Indre", 37: "Indre-et-Loire", 41: "Loir-et-Cher", 45: "Loiret" } },
+            5: { name: "Corse", departments: { "2A": "Corse-du-Sud", "2B": "Haute-Corse" } },
+            6: { name: "Grand Est", departments: { 8: "Ardennes", 10: "Aube", 51: "Marne", 52: "Haute-Marne", 54: "Meurthe-et-Moselle", 55: "Meuse", 57: "Moselle", 67: "Bas-Rhin", 68: "Haut-Rhin", 88: "Vosges" } },
+            7: { name: "Hauts-de-France", departments: { 2: "Aisne", 59: "Nord", 60: "Oise", 62: "Pas-de-Calais", 80: "Somme" } },
+            8: { name: "Île-de-France", departments: { 75: "Paris", 77: "Seine-et-Marne", 78: "Yvelines", 91: "Essonne", 92: "Hauts-de-Seine", 93: "Seine-Saint-Denis", 94: "Val-de-Marne", 95: "Val-d'Oise" } },
+            9: { name: "Normandie", departments: { 14: "Calvados", 27: "Eure", 50: "Manche", 61: "Orne", 76: "Seine-Maritime" } },
+            10: { name: "Nouvelle-Aquitaine", departments: { 16: "Charente", 17: "Charente-Maritime", 19: "Corrèze", 23: "Creuse", 24: "Dordogne", 33: "Gironde", 40: "Landes", 47: "Lot-et-Garonne", 64: "Pyrénées-Atlantiques", 79: "Deux-Sèvres", 86: "Vienne", 87: "Haute-Vienne" } },
+            11: { name: "Occitanie", departments: { 9: "Ariège", 11: "Aude", 12: "Aveyron", 30: "Gard", 31: "Haute-Garonne", 32: "Gers", 34: "Hérault", 46: "Lot", 48: "Lozère", 65: "Hautes-Pyrénées", 66: "Pyrénées-Orientales", 81: "Tarn", 82: "Tarn-et-Garonne" } },
+            12: { name: "Pays de la Loire", departments: { 44: "Loire-Atlantique", 49: "Maine-et-Loire", 53: "Mayenne", 72: "Sarthe", 85: "Vendée" } },
+            13: { name: "Provence-Alpes-Côte d'Azur", departments: { 4: "Alpes-de-Haute-Provence", 5: "Hautes-Alpes", 6: "Alpes-Maritimes", 13: "Bouches-du-Rhône", 83: "Var", 84: "Vaucluse" } },
+            14: { name: "DOM-TOM", departments: { 971: "Guadeloupe", 972: "Martinique", 973: "Guyane", 974: "La Réunion", 976: "Mayotte" } }
+        };
+
+        let chosenRegion = null;
+        let remainingDepartments = [];
+        let score = 0;
+        let totalDepartments = 0;
+
+        function chooseRegion() {
+            const regionNumber = parseInt(document.getElementById("regionInput").value);
+            if (regions[regionNumber]) {
+                chosenRegion = regions[regionNumber];
+                remainingDepartments = Object.entries(chosenRegion.departments);
+                score = 0;
+                totalDepartments = remainingDepartments.length;
+                document.getElementById("output").innerText = `Vous avez choisi la région : ${chosenRegion.name}`;
+                document.getElementById("score").innerText = `Score : ${score}/${totalDepartments}`;
+                document.getElementById("answerInput").value = "";
+                nextDepartment();
+            } else {
+                alert("Veuillez entrer un numéro de région valide.");
+            }
+        }
+
+        function nextDepartment() {
+            if (remainingDepartments.length === 0) {
+                document.getElementById("output").innerText += `\nPartie terminée ! Votre score : ${score}/${totalDepartments}`;
+                document.getElementById("question").innerText = "Voulez-vous essayer une autre région ? Saisissez son numéro ci-dessus.";
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * remainingDepartments.length);
+            const [departmentNumber, departmentName] = remainingDepartments[randomIndex];
+            document.getElementById("question").innerText = `Quel est le numéro du département : ${departmentName} ?`;
+
+            document.getElementById("checkButton").onclick = function () {
+                checkAnswer(departmentNumber, departmentName, randomIndex);
+            };
+        }
+
+        function checkAnswer(departmentNumber, departmentName, index) {
+    const userAnswer = document.getElementById("answerInput").value;
+    const resultDisplay = document.getElementById("result");
+
+    const isCorrect = userAnswer == departmentNumber;
+    if (isCorrect) {
+        resultDisplay.innerText = `Bravo ! ${departmentName} (${departmentNumber}) est correct.`;
+        resultDisplay.style.color = "green";
+        score++;
+    } else {
+        resultDisplay.innerText = `Faux ! La bonne réponse était : ${departmentNumber} (${departmentName}).`;
+        resultDisplay.style.color = "red";
+    }
+
+    // Mettre à jour l'historique
+    updateHistory(departmentName, userAnswer, departmentNumber, isCorrect);
+
+    document.getElementById("score").innerText = `Score : ${score}/${totalDepartments}`;
+    remainingDepartments.splice(index, 1);
+    document.getElementById("answerInput").value = "";
+    nextDepartment();
+}
+
+function updateHistory(departmentName, userAnswer, departmentNumber, isCorrect) {
+    const historyList = document.getElementById("history");
+    const historyItem = document.createElement("li");
+    historyItem.style.color = isCorrect ? "green" : "red";
+    historyItem.textContent = isCorrect
+        ? `✅ ${departmentName} (${departmentNumber}) - Correct`
+        : `❌ ${departmentName} (${userAnswer || "Aucune réponse"}), Réponse attendue : ${departmentNumber}`;
+    historyList.appendChild(historyItem);
+}
+
+    </script>
+</head>
+<body>
+    <h1>Entraînement Régions et Départements</h1>
+    <p>Saisissez le numéro de la région où vous voulez vous entraîner :</p>
+    <ul>
+        <li>1: Auvergne-Rhône-Alpes</li>
+        <li>2: Bourgogne-Franche-Comté</li>
+        <li>3: Bretagne</li>
+        <li>4: Centre-Val de Loire</li>
+        <li>5: Corse</li>
+        <li>6: Grand Est</li>
+        <li>7: Hauts-de-France</li>
+        <li>8: Île-de-France</li>
+        <li>9: Normandie</li>
+        <li>10: Nouvelle-Aquitaine</li>
+        <li>11: Occitanie</li>
+        <li>12: Pays de la Loire</li>
+        <li>13: Provence-Alpes-Côte d'Azur</li>
+        <li>14: DOM-TOM</li>
+    </ul>
+    <input type="text" id="regionInput" placeholder="Numéro de la région">
+    <button onclick="chooseRegion()">Commencer</button>
+
+    <h2 id="output"></h2>
+    <p id="question"></p>
+    <input type="text" id="answerInput" placeholder="Numéro du département">
+    <button id="checkButton">Vérifier</button>
+    <p id="result"></p>
+    <h3 id="score"></h3>
+
+	<h3>Historique des réponses :</h3>
+	<ul id="history"></ul>
+
+</body>
+</html>
+       
